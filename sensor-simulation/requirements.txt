@@ -7,6 +7,7 @@ janus==2.0.0
 packaging==24.2
 paho-mqtt==1.6.1
 PySocks==1.7.1
+python-dotenv==1.1.0
 requests==2.32.3
 requests-unixsocket2==0.4.2
 typing_extensions==4.13.0
