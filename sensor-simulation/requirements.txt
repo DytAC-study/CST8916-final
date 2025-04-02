@@ -1,0 +1,14 @@
+azure-iot-device==2.14.0
+certifi==2025.1.31
+charset-normalizer==3.4.1
+deprecation==2.1.0
+idna==3.10
+janus==2.0.0
+packaging==24.2
+paho-mqtt==1.6.1
+PySocks==1.7.1
+python-dotenv==1.1.0
+requests==2.32.3
+requests-unixsocket2==0.4.2
+typing_extensions==4.13.0
+urllib3==2.3.0
