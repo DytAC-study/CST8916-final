@@ -262,7 +262,7 @@ The Rideau Canal Skateway in Ottawa is celebrated as the world's largest natural
   ```shell
   echo 'CONNECTION_STRING1="Your connection string for sensor1 to Azure IoT Hub"' > .env
   echo 'CONNECTION_STRING2="Your connection string for sensor2 to Azure IoT Hub"' >> .env
-  echo '"CONNECTION_STRING3=Your connection string for sensor3 to Azure IoT Hub"' >> .env
+  echo 'CONNECTION_STRING3="Your connection string for sensor3 to Azure IoT Hub"' >> .env
   ```
 
 - Run test to see if this script works. This will output simulation data to terminal. use Ctrl+C to stop the test:
