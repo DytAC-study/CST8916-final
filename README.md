@@ -114,7 +114,7 @@ The Rideau Canal Skateway in Ottawa is celebrated as the world's largest natural
 
   - The endpoints and message routing are left as default.
 
-  - Create three sensors to simulate the sensors located in three parts of the Rideau River, record their primary connection string:
+  - Create three sensors to simulate the sensors located in three parts of the Rideau River, and record their primary connection string:
 
     ```txt
     # sensor1
@@ -154,11 +154,11 @@ The Rideau Canal Skateway in Ottawa is celebrated as the world's largest natural
       - Format: Line separated
       - Encoding: UTF-8
       - Write mode: Append
-      - Path pattern: output/{date}/{time}
+      - Path pattern: output/{date}/{time}/{location}
       - Date format: YYYY/MM/DD
       - Time format: HH
 
-  - Query logic: calculate the average value of ice thickness, snow accumulation, external temperature and group by device id and location. Perform this query every 5 minutes.
+  - Query logic: calculate the average value of ice thickness, snow accumulation, external temperature, and group by device ID and location. Perform this query every 5 minutes.
 
   - Sample queries used for data processing.
 
@@ -181,7 +181,11 @@ The Rideau Canal Skateway in Ottawa is celebrated as the world's largest natural
 
 - Azure Blob Storage
 
-  - The processed data is stored in Blob Storage under the container streameddata, the folder structure is sorted by time, when creating Stream Analytics Job Output, we set the folder structure to `output/{date}/{time}`, then after processing, the data will be stored in that directory. Mine is `streameddata / output / 2025 / 04 / 02 / 21`.
+  - The processed data is stored in Blob Storage under the container streameddata, the folder structure is sorted by time, when creating Stream Analytics Job Output, we set the folder structure to `output/{date}/{time}/{location}`, then after processing, the data will be stored by time date and their location in that directory. 
+
+    - Dow's Lake: streameddata / output / 2025 / 04 / 02 / 22 / Dow's%20Lake
+    - Fifth Avenue: streameddata / output / 2025 / 04 / 02 / 22 / Fifth%20Avenue
+    - NAC: streameddata / output / 2025 / 04 / 02 / 22 / NAC
 
   - format of stored processed data (JSON):
 
@@ -312,7 +316,7 @@ The following are the steps which set up and run the IoT Hub and Stream Analytic
 
   1. In the Azure Portal, search for Storage accounts and click Create.
   2. Properly set Resource group (CST8916-Final), Storage account name (rideaucanal), Region (Canada Central), Primary service (Azure Blob Storage), Redundancy (Locally-redundant storage), then Create.
-  3. Under Data storage, chose Containers and create a new container to store data.
+  3. Under Data storage, choose Containers and create a new container to store processed data (streameddata) and another container to store raw data (rawdata).
 
 - Define Output
 
@@ -321,7 +325,7 @@ The following are the steps which set up and run the IoT Hub and Stream Analytic
   3. Provide the following details:
      - Storage Account: Select your Azure Storage Account.
      - Container: Create or choose an existing container for storing results.
-     - Path Pattern: Optionally define a folder structure (e.g., output/{date}/{time}).
+     - Path Pattern: Define a folder structure (output/{date}/{time}/{location}) to manage the output data.
 
 - Write the Stream Analytics Query
 
@@ -353,18 +357,52 @@ The following are the steps which set up and run the IoT Hub and Stream Analytic
 ### Accessing Stored Data
 
 - Check Blob Storage
-  - Go to Azure Storage Account.
+  - Go to the Azure Storage Account.
   - Navigate to the container (streameddata) specified in the output.
-  - The processed data is being stored inside streameddata/output.
-  - The monitor data is being stored inside insights-metrics directory (mine is insights-metrics-pt1m).
+  - The processed data is being stored inside streameddata/output/YYYY/MM/DD/HH/location.
+  - The monitor data is being stored inside the insights-metrics directory (mine is insights-metrics-pt1m).
   - Verify that processed data is being stored in JSON format. (download and check).
 
 ## **Results**:
 
-- Highlight key findings, such as:
-  - Aggregated data outputs (e.g., average ice thickness).
-- Include references to sample output files stored in Blob Storage.
+- **Key Findings:**
+
+  - We could seed the average ice thickness, snow accumulation, external temperature, and surface temperature from each sensor. For instance:
+
+    ```
+    {"DeviceId":"sensor2","location":"NAC","AvgIceThickness":27.27142857142857,"AvgSnowAccumulation":7.964285714285715,"AvgExternalTemperature":-11.571428571428573,"AvgSurfaceTemperature":-9.028571428571428,"EventTime":"2025-04-02T23:00:00.0000000Z"}
+    ```
+
+    - DeviceId: sensor2
+    - location: NAC
+    - Average Ice Thickness: 27.3 cm
+    - Average Snow Accumulation: 7.9 cm
+    - Average External Temperature: -11.6°C
+    - Average Surface Temperature: -9.0°C
+
+  - These metrics provide insights into the overall conditions monitored during the simulation, helping us analyze the trend to review and forecast the weather conditions for each location.
+
+- **Reference Sample Output Files:**
+
+  - This is the storage file stored in Azure Blob Storage for NAC. (If this link is not accessible, it means I deleted the resource to save credits.)
+
+    - Blob SAS URL：
+
+    https://rideaucanal.blob.core.windows.net/streameddata/output/2025/04/02/23/NAC/0_17138e35107a487e9f19a4eac7bb5763_1.json?sp=r&st=2025-04-02T23:58:13Z&se=2025-04-03T07:58:13Z&spr=https&sv=2024-11-04&sr=b&sig=dqawiHfugH5mqF8wULaYkx2GWHGIazLbJMNxxfc%2FkVE%3D
+
+  - Sample files can be accessed at this GitHub repo under `sampleOutput/`.
+
+    
 
 ## **Reflection**:
 
-- Discuss any challenges faced during implementation and how they were addressed.
+- **Challenges Faced:**
+  - *Data Quality and Integration:*
+    - Ensuring the simulated data accurately reflected real-world conditions was challenging. Inconsistent or unrealistic data could damage the validity of the simulation.
+    - *Path pattern set:* It needs a lot of adjustments to decide how to set the path pattern, making the processed data easy to locate.
+  - *System Performance*:
+    - Handling and processing large volumes of data in real-time posed performance issues.
+    - *Solution:* Optimized the data processing pipeline by implementing efficient data structures and algorithms, and utilized Azure's scalable resources to manage load effectively.
+- **Lessons Learned:**
+  - The importance of thoroughly testing the simulation code to meet the project's needs.
+  - The importance of the configuration of the path pattern of the output data, mak the results easy to locate and has clear directory structure for users.
